@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام الجمعية</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a2e4a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  :root {
+    --navy:   #1a2e4a;
+    --blue:   #2563a8;
+    --gold:   #c8922a;
+    --gold-lt:#fdf3e0;
+    --green:  #276b43;
+    --green-lt:#eaf4ee;
+    --red:    #b91c1c;
+    --red-lt: #fef2f2;
+    --purple: #6d28d9;
+    --purple-lt:#f3f0ff;
+    --gray1:  #f7f8fa;
+    --gray2:  #e8eaed;
+    --gray3:  #9ca3af;
+    --text:   #1e2328;
+    --radius: 14px;
+    --shadow: 0 2px 16px rgba(0,0,0,.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: #f0f2f6;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─────────────────────────────────────── */
+  .app-header {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e4080 100%);
+    color: #fff;
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 14px rgba(0,0,0,.25);
+  }
+  .app-header .logo { font-size: 2rem; }
+  .app-header h1 { font-size: 1.35rem; font-weight: 900; letter-spacing: -.3px; }
+  .app-header p  { font-size: .8rem; opacity: .7; margin-top: 1px; }
+  .header-badge {
+    margin-right: auto;
+    background: var(--gold);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* ─── Tabs ────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    background: var(--navy);
+    padding: 0 16px;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.6);
+    font-family: 'Cairo', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 11px 16px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover  { color: rgba(255,255,255,.9); }
+  .tab-btn.active { color: #fff; border-bottom-color: var(--gold); }
+
+  /* ─── Main layout ─────────────────────────────────── */
+  .main { max-width: 960px; margin: 0 auto; padding: 20px 16px 40px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ─── Cards ───────────────────────────────────────── */
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--gray2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ─── Settings grid ───────────────────────────────── */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:560px) { .settings-grid { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-group label {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--gray3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .field-group input, .field-group select {
+    border: 2px solid var(--gray2);
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-align: center;
+    transition: border-color .2s;
+    width: 100%;
+  }
+  .field-group input:focus, .field-group select:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  /* ─── Stats row ───────────────────────────────────── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .stat-box {
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .stat-box .stat-lbl { font-size: .75rem; font-weight: 600; opacity: .75; margin-bottom: 6px; }
+  .stat-box .stat-val { font-size: 1.45rem; font-weight: 900; }
+
+  .stat-blue   { background: #dbeafe; color: var(--blue); }
+  .stat-green  { background: var(--green-lt); color: var(--green); }
+  .stat-gold   { background: var(--gold-lt); color: #92640d; }
+  .stat-purple { background: var(--purple-lt); color: var(--purple); }
+  .stat-red    { background: var(--red-lt); color: var(--red); }
+
+  /* ─── Table ───────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+    min-width: 520px;
+  }
+  thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 11px 12px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+  }
+  thead th:first-child { border-radius: 0 8px 0 0; }
+  thead th:last-child  { border-radius: 8px 0 0 0; }
+  tbody tr:nth-child(even) td { background: var(--gray1); }
+  tbody tr:hover td { background: #e8f0fc; }
+  tbody td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--gray2);
+    text-align: center;
+    vertical-align: middle;
+  }
+  tbody td:nth-child(2) { text-align: right; font-weight: 600; }
+  tfoot td {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  /* editable cells */
+  td.editable input, td.editable select {
+    border: 1px solid var(--gray2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: .85rem;
+    width: 100%;
+    text-align: center;
+    background: #fff;
+    min-width: 80px;
+  }
+  td.editable input:focus, td.editable select:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: #eff6ff;
+  }
+
+  /* status badges */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 700;
+  }
+  .badge-green  { background: var(--green-lt);  color: var(--green); }
+  .badge-red    { background: var(--red-lt);    color: var(--red); }
+  .badge-gold   { background: var(--gold-lt);   color: #92640d; }
+  .badge-gray   { background: var(--gray2);     color: var(--gray3); }
+  .badge-blue   { background: #dbeafe;          color: var(--blue); }
+
+  /* ─── Buttons ─────────────────────────────────────── */
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .btn {
+    padding: 9px 20px;
+    border-radius: 9px;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .18s, transform .12s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--blue);  color: #fff; }
+  .btn-green   { background: var(--green); color: #fff; }
+  .btn-gold    { background: var(--gold);  color: #fff; }
+  .btn-red     { background: var(--red);   color: #fff; }
+  .btn-ghost   { background: var(--gray2); color: var(--navy); }
+  .btn:hover   { opacity: .88; }
+
+  /* ─── Progress bar ────────────────────────────────── */
+  .progress-wrap { background: var(--gray2); border-radius: 20px; height: 8px; overflow: hidden; }
+  .progress-bar  {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, var(--green), #4ade80);
+    transition: width .5s ease;
+  }
+
+  /* ─── Summary cards ───────────────────────────────── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .sum-card {
+    border-radius: 14px;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sum-card .sum-icon { font-size: 1.7rem; }
+  .sum-card .sum-lbl  { font-size: .78rem; font-weight: 700; opacity: .75; }
+  .sum-card .sum-val  { font-size: 1.5rem; font-weight: 900; }
+
+  /* ─── Payment matrix ──────────────────────────────── */
+  .pay-matrix th.month-h { font-size: .75rem; padding: 6px 4px; white-space: nowrap; }
+  .pay-matrix td { padding: 6px 4px; }
+  .pay-cell {
+    width: 36px;
+    height: 28px;
+    border-radius: 5px;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .pay-cell.paid     { background: var(--green-lt); color: var(--green); }
+  .pay-cell.unpaid   { background: var(--gray2);    color: var(--gray3); }
+  .pay-cell.overdue  { background: var(--red-lt);   color: var(--red); }
+
+  /* ─── Toast ───────────────────────────────────────── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--navy);
+    color: #fff;
+    padding: 11px 24px;
+    border-radius: 30px;
+    font-size: .9rem;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    transition: transform .3s ease;
+    z-index: 999;
+    pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── Section header ──────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* number badge */
+  .num-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+  }
+
+  @media print {
+    .app-header, .tabs, .btn-row, #toast { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">🏦</div>
+  <div>
+    <h1>نظام الجمعية</h1>
+    <p>إدارة تجمع المدخرات بسهولة</p>
+  </div>
+  <span class="header-badge" id="headerBadge">...</span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('settings')">⚙️ الإعدادات</button>
+  <button class="tab-btn" onclick="showTab('members')">👥 الأعضاء</button>
+  <button class="tab-btn" onclick="showTab('schedule')">📅 جدول الصرف</button>
+  <button class="tab-btn" onclick="showTab('payments')">💳 متابعة الدفع</button>
+  <button class="tab-btn" onclick="showTab('summary')">📊 الملخص</button>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════
+     TAB 1: إعدادات
+══════════════════════════════════════════════ -->
+<div id="tab-settings" class="tab-panel active">
+  <div class="card">
+    <div class="card-title">⚙️ إعدادات الجمعية</div>
+    <div class="settings-grid">
+      <div class="field-group">
+        <label>إجمالي مبلغ الجمعية (جنيه)</label>
+        <input type="number" id="totalAmount" value="10000" min="100" step="100" onchange="saveAndRefresh()">
+      </div>
+      <div class="field-group">
+        <label>عدد الأفراد المشاركين</label>
+        <input type="number" id="memberCount" value="10" min="2" max="50" onchange="onMemberCountChange()">
+      </div>
+      <div class="field-group">
+        <label>عدد الأشهر (دورات الصرف)</label>
+        <input type="number" id="monthCount" value="10" min="1" max="36" onchange="saveAndRefresh()">
+      </div>
+      <div class="field-group">
+        <label>تاريخ بدء الجمعية</label>
+        <input type="date" id="startDate" onchange="saveAndRefresh()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 النتائج المحسوبة</div>
+    <div class="stats-row" id="calcStats">
+      <div class="stat-box stat-blue"><div class="stat-lbl">إجمالي الجمعية</div><div class="stat-val" id="cs-total">-</div></div>
+      <div class="stat-box stat-green"><div class="stat-lbl">نصيب كل فرد عند الصرف</div><div class="stat-val" id="cs-share">-</div></div>
+      <div class="stat-box stat-gold"><div class="stat-lbl">القسط الشهري للفرد</div><div class="stat-val" id="cs-monthly">-</div></div>
+      <div class="stat-box stat-purple"><div class="stat-lbl">عدد الأفراد</div><div class="stat-val" id="cs-members">-</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💡 تعليمات الاستخدام</div>
+    <ol style="padding-right:20px; line-height:2; font-size:.9rem; color:#555;">
+      <li>اضبط إعدادات الجمعية هنا (المبلغ، الأفراد، الأشهر)</li>
+      <li>أضف بيانات الأعضاء من تبويب <b>الأعضاء</b></li>
+      <li>تبويب <b>جدول الصرف</b> بيتحدث تلقائياً بأسماء الأعضاء</li>
+      <li>سجّل الدفعات الشهرية من تبويب <b>متابعة الدفع</b></li>
+      <li>شوف الملخص العام من تبويب <b>الملخص</b></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2: الأعضاء
+══════════════════════════════════════════════ -->
+<div id="tab-members" class="tab-panel">
+  <div class="card">
+    <div class="section-header">
+      <span class="section-title">👥 قائمة الأعضاء</span>
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn btn-green" onclick="addMemberRow()">➕ عضو جديد</button>
+        <button class="btn btn-ghost" onclick="window.print()">🖨️ طباعة</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table id="membersTable">
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>رقم الدور</th>
+            <th>اسم العضو</th>
+            <th>رقم الهاتف</th>
+            <th>طريقة الدفع</th>
+            <th>النصيب (جنيه)</th>
+            <th>الحالة</th>
+            <th>ملاحظات</th>
+            <th>حذف</th>
+          </tr>
+        </thead>
+        <tbody id="membersTbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align:right">الإجمالي</td>
+            <td id="membersTotal">-</td>
+            <td colspan="3"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3: جدول الصرف
+══════════════════════════════════════════════ -->
+<div id="tab-schedule" class="tab-panel">
+  <div class="card">
+    <div class="section-header">
+      <span class="section-title">📅 جدول صرف الجمعية</span>
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ طباعة</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="scheduleTable">
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>الشهر</th>
+            <th>المستفيد</th>
+            <th>تاريخ الصرف</th>
+            <th>المبلغ المستحق</th>
+            <th>المبلغ المدفوع</th>
+            <th>الحالة</th>
+            <th>ملاحظات</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleTbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" style="text-align:right">الإجمالي</td>
+            <td id="schedDue">-</td>
+            <td id="schedPaid">-</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4: متابعة الدفع
+══════════════════════════════════════════════ -->
+<div id="tab-payments" class="tab-panel">
+  <div class="card">
+    <div class="section-header">
+      <span class="section-title">💳 متابعة الدفعات الشهرية</span>
+      <span style="font-size:.8rem;color:var(--gray3)">اضغط على الخلية لتغيير الحالة</span>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:.8rem;font-weight:600">
+      <span class="badge badge-green">✓ دفع</span>
+      <span class="badge badge-red">✗ متأخر</span>
+      <span class="badge badge-gray">— لم يحن</span>
+    </div>
+    <div class="tbl-wrap" id="paymentMatrixWrap"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 5: الملخص
+══════════════════════════════════════════════ -->
+<div id="tab-summary" class="tab-panel">
+  <div class="summary-grid" id="summaryGrid">
+    <div class="sum-card stat-blue">
+      <span class="sum-icon">💰</span>
+      <span class="sum-lbl">إجمالي مبلغ الجمعية</span>
+      <span class="sum-val" id="sum-total">-</span>
+    </div>
+    <div class="sum-card stat-green">
+      <span class="sum-icon">👥</span>
+      <span class="sum-lbl">عدد الأعضاء المشاركين</span>
+      <span class="sum-val" id="sum-members">-</span>
+    </div>
+    <div class="sum-card stat-gold">
+      <span class="sum-icon">💵</span>
+      <span class="sum-lbl">نصيب كل فرد عند الصرف</span>
+      <span class="sum-val" id="sum-share">-</span>
+    </div>
+    <div class="sum-card stat-purple">
+      <span class="sum-icon">💳</span>
+      <span class="sum-lbl">القسط الشهري للفرد</span>
+      <span class="sum-val" id="sum-monthly">-</span>
+    </div>
+    <div class="sum-card stat-green">
+      <span class="sum-icon">✅</span>
+      <span class="sum-lbl">إجمالي المبالغ المحصلة</span>
+      <span class="sum-val" id="sum-collected">-</span>
+    </div>
+    <div class="sum-card stat-red">
+      <span class="sum-icon">📤</span>
+      <span class="sum-lbl">إجمالي المبالغ المصروفة</span>
+      <span class="sum-val" id="sum-disbursed">-</span>
+    </div>
+    <div class="sum-card stat-blue">
+      <span class="sum-icon">🏦</span>
+      <span class="sum-lbl">الرصيد المتاح حالياً</span>
+      <span class="sum-val" id="sum-balance">-</span>
+    </div>
+    <div class="sum-card stat-gold">
+      <span class="sum-icon">📅</span>
+      <span class="sum-lbl">الدورات المكتملة</span>
+      <span class="sum-val" id="sum-cycles">-</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">📈 نسبة تحصيل الأقساط</div>
+    <div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;margin-bottom:8px">
+      <span id="prog-label">0 جنيه من 0 جنيه</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 حالة الأعضاء</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>م</th><th>الاسم</th><th>الدور</th><th>النصيب</th><th>إجمالي مدفوع</th><th>نسبة الالتزام</th><th>الحالة</th></tr>
+        </thead>
+        <tbody id="summaryMemberTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو',
+                   'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const PAY_METHODS = ['كاش','تحويل','فوري','انستاباي'];
+const STATUS_OPTIONS = ['نشط','منتظم','متأخر','مكتمل'];
+const SCHED_STATUS = ['لم يُصرف','تم الصرف','مرحّل'];
+
+// init default start date = today
+document.getElementById('startDate').valueAsDate = new Date();
+
+function getState() {
+  const raw = localStorage.getItem('gam3iyaState');
+  if (raw) return JSON.parse(raw);
+  // defaults
+  return {
+    totalAmount: 10000,
+    memberCount: 10,
+    monthCount:  10,
+    startDate:   new Date().toISOString().slice(0,10),
+    members: Array.from({length:10}, (_,i)=>({
+      id: i+1,
+      turn: i+1,
+      name: '',
+      phone: '',
+      payMethod: 'كاش',
+      status: 'نشط',
+      notes: ''
+    })),
+    schedule: [],   // {month, beneficiary, date, due, paid, status, notes}
+    payments: {}    // key: `m${memberIdx}_${monthIdx}` => 'paid'|'unpaid'|'overdue'
+  };
+}
+
+function saveState(s) {
+  localStorage.setItem('gam3iyaState', JSON.stringify(s));
+}
+
+let S = getState();
+
+// sync inputs to state
+function syncInputsToState() {
+  S.totalAmount  = +document.getElementById('totalAmount').value || 10000;
+  S.memberCount  = +document.getElementById('memberCount').value || 10;
+  S.monthCount   = +document.getElementById('monthCount').value  || 10;
+  S.startDate    = document.getElementById('startDate').value;
+}
+function syncStateToInputs() {
+  document.getElementById('totalAmount').value = S.totalAmount;
+  document.getElementById('memberCount').value = S.memberCount;
+  document.getElementById('monthCount').value  = S.monthCount;
+  document.getElementById('startDate').value   = S.startDate;
+}
+
+// ══════════════════════════════════════════════════════
+// COMPUTED
+// ══════════════════════════════════════════════════════
+function sharePerMember()  { return S.totalAmount; }
+function monthlyPerMember(){ return S.totalAmount / S.memberCount; }
+
+function addMonths(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + n);
+  return d.toLocaleDateString('ar-EG', {day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function monthLabel(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + n);
+  return MONTHS_AR[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// ══════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════
+function saveAndRefresh() {
+  syncInputsToState();
+  // ensure members array length matches
+  while (S.members.length < S.memberCount) {
+    const n = S.members.length + 1;
+    S.members.push({id:n,turn:n,name:'',phone:'',payMethod:'كاش',status:'نشط',notes:''});
+  }
+  // don't truncate, just render rows up to memberCount
+  saveState(S);
+  renderAll();
+}
+
+function onMemberCountChange() {
+  saveAndRefresh();
+}
+
+function renderSettings() {
+  const total   = S.totalAmount;
+  const mc      = S.memberCount;
+  const share   = sharePerMember();
+  const monthly = monthlyPerMember();
+
+  document.getElementById('cs-total').textContent   = fmt(total);
+  document.getElementById('cs-share').textContent   = fmt(share);
+  document.getElementById('cs-monthly').textContent = fmt(monthly);
+  document.getElementById('cs-members').textContent = mc + ' فرد';
+  document.getElementById('headerBadge').textContent= fmt(total) + ' ج';
+}
+
+// ══════════════════════════════════════════════════════
+// MEMBERS
+// ══════════════════════════════════════════════════════
+function renderMembers() {
+  const tbody = document.getElementById('membersTbody');
+  tbody.innerHTML = '';
+  const count = Math.min(S.memberCount, S.members.length);
+
+  for (let i = 0; i < count; i++) {
+    const m = S.members[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td class="editable"><input type="number" value="${m.turn}" min="1" onchange="updateMember(${i},'turn',this.value)"></td>
+      <td class="editable"><input type="text" value="${m.name}" placeholder="الاسم كامل" onchange="updateMember(${i},'name',this.value)"></td>
+      <td class="editable"><input type="tel" value="${m.phone}" placeholder="01xxxxxxxxx" onchange="updateMember(${i},'phone',this.value)"></td>
+      <td class="editable">${selHTML('payMethod',PAY_METHODS,m.payMethod,i)}</td>
+      <td style="font-weight:700;color:var(--green)">${fmt(monthlyPerMember())}</td>
+      <td class="editable">${selHTML('status',STATUS_OPTIONS,m.status,i)}</td>
+      <td class="editable"><input type="text" value="${m.notes||''}" placeholder="ملاحظة" onchange="updateMember(${i},'notes',this.value)"></td>
+      <td><button class="btn btn-red" style="padding:4px 10px;font-size:.75rem" onclick="removeMember(${i})">🗑</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('membersTotal').textContent = fmt(monthlyPerMember() * count);
+}
+
+function selHTML(field, opts, current, idx) {
+  const o = opts.map(v=>`<option value="${v}" ${v===current?'selected':''}>${v}</option>`).join('');
+  return `<select onchange="updateMember(${idx},'${field}',this.value)">${o}</select>`;
+}
+
+function updateMember(idx, field, val) {
+  S.members[idx][field] = field==='turn' ? +val : val;
+  saveState(S);
+  renderSchedule();
+  renderSummary();
+}
+
+function addMemberRow() {
+  S.memberCount++;
+  document.getElementById('memberCount').value = S.memberCount;
+  const n = S.members.length + 1;
+  S.members.push({id:n,turn:n,name:'',phone:'',payMethod:'كاش',status:'نشط',notes:''});
+  saveState(S);
+  renderAll();
+  showToast('تم إضافة عضو جديد ✓');
+}
+
+function removeMember(idx) {
+  if (!confirm('هل تريد حذف هذا العضو؟')) return;
+  S.members.splice(idx, 1);
+  S.memberCount = Math.max(1, S.memberCount - 1);
+  document.getElementById('memberCount').value = S.memberCount;
+  saveState(S);
+  renderAll();
+  showToast('تم حذف العضو');
+}
+
+// ══════════════════════════════════════════════════════
+// SCHEDULE
+// ══════════════════════════════════════════════════════
+function renderSchedule() {
+  const tbody   = document.getElementById('scheduleTbody');
+  tbody.innerHTML = '';
+  // build schedule data if not enough rows
+  while (S.schedule.length < S.monthCount) {
+    S.schedule.push({paid:'', status:'لم يُصرف', notes:''});
+  }
+
+  const count = Math.min(S.monthCount, S.members.length);
+  // sort members by turn
+  const sorted = [...S.members.slice(0, count)].sort((a,b)=>a.turn-b.turn);
+
+  let totalDue = 0, totalPaid = 0;
+
+  for (let i = 0; i < count; i++) {
+    const m   = sorted[i] || {};
+    const sd  = S.schedule[i] || {};
+    const due = S.totalAmount;
+    totalDue += due;
+    const paid = +sd.paid || 0;
+    totalPaid += paid;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><span class="badge badge-blue">${monthLabel(S.startDate, i)}</span></td>
+      <td style="text-align:right;font-weight:700">${m.name || '— لم يُحدد —'}</td>
+      <td>${addMonths(S.startDate, i)}</td>
+      <td style="font-weight:700;color:var(--green)">${fmt(due)}</td>
+      <td class="editable"><input type="number" value="${sd.paid||''}" placeholder="0" onchange="updateSchedule(${i},'paid',this.value)"></td>
+      <td>${schedStatusSel(i, sd.status)}</td>
+      <td class="editable"><input type="text" value="${sd.notes||''}" placeholder="ملاحظة" onchange="updateSchedule(${i},'notes',this.value)"></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('schedDue').textContent  = fmt(totalDue);
+  document.getElementById('schedPaid').textContent = fmt(totalPaid);
+}
+
+function schedStatusSel(idx, current) {
+  const o = SCHED_STATUS.map(v=>`<option value="${v}" ${v===current?'selected':''}>${v}</option>`).join('');
+  return `<select onchange="updateSchedule(${idx},'status',this.value)">${o}</select>`;
+}
+
+function updateSchedule(idx, field, val) {
+  if (!S.schedule[idx]) S.schedule[idx] = {};
+  S.schedule[idx][field] = val;
+  saveState(S);
+  renderSummary();
+}
+
+// ══════════════════════════════════════════════════════
+// PAYMENTS MATRIX
+// ══════════════════════════════════════════════════════
+function renderPayments() {
+  const wrap  = document.getElementById('paymentMatrixWrap');
+  const count = Math.min(S.memberCount, S.members.length);
+  const mc    = S.monthCount;
+
+  let html = `<table class="pay-matrix" style="min-width:${mc*42+220}px">
+    <thead><tr>
+      <th style="width:32px">م</th>
+      <th style="min-width:150px;text-align:right">اسم العضو</th>`;
+
+  for (let j = 0; j < mc; j++) {
+    html += `<th class="month-h">${monthLabel(S.startDate, j).split(' ')[0]}</th>`;
+  }
+  html += `<th>المدفوع</th><th>الالتزام</th></tr></thead><tbody>`;
+
+  let grandTotal = 0;
+
+  for (let i = 0; i < count; i++) {
+    const m = S.members[i];
+    html += `<tr><td>${i+1}</td><td style="text-align:right;font-weight:700;padding:6px 10px">${m.name||'—'}</td>`;
+
+    let memberTotal = 0;
+    for (let j = 0; j < mc; j++) {
+      const key = `m${i}_${j}`;
+      const st  = S.payments[key] || 'unpaid';
+      const cls = st === 'paid' ? 'paid' : st === 'overdue' ? 'overdue' : 'unpaid';
+      const lbl = st === 'paid' ? '✓' : st === 'overdue' ? '✗' : '—';
+      html += `<td><button class="pay-cell ${cls}" onclick="togglePayment(${i},${j})">${lbl}</button></td>`;
+      if (st === 'paid') memberTotal += monthlyPerMember();
+    }
+    grandTotal += memberTotal;
+
+    const target  = monthlyPerMember() * mc;
+    const pct     = target > 0 ? Math.round(memberTotal / target * 100) : 0;
+    const pctColor= pct>=80?'var(--green)':pct>=50?'var(--gold)':'var(--red)';
+    html += `<td style="font-weight:700;color:var(--green)">${fmt(memberTotal)}</td>
+             <td style="font-weight:700;color:${pctColor}">${pct}%</td></tr>`;
+  }
+
+  // totals
+  html += `<tr style="background:var(--navy)">
+    <td colspan="2" style="color:#fff;font-weight:700;padding:8px 12px;text-align:right">الإجمالي</td>`;
+  for (let j = 0; j < mc; j++) {
+    let colTotal = 0;
+    for (let i = 0; i < count; i++) {
+      if (S.payments[`m${i}_${j}`] === 'paid') colTotal++;
+    }
+    html += `<td style="color:#fff;font-size:.78rem;font-weight:700">${colTotal}/${count}</td>`;
+  }
+  html += `<td style="color:#fff;font-weight:700">${fmt(grandTotal)}</td><td></td></tr>`;
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+function togglePayment(mi, ji) {
+  const key = `m${mi}_${ji}`;
+  const cur = S.payments[key] || 'unpaid';
+  const next= cur==='unpaid'?'paid': cur==='paid'?'overdue':'unpaid';
+  S.payments[key] = next;
+  saveState(S);
+  renderPayments();
+  renderSummary();
+}
+
+// ══════════════════════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════════════════════
+function renderSummary() {
+  const count  = Math.min(S.memberCount, S.members.length);
+  const mc     = S.monthCount;
+  const share  = sharePerMember();
+  const monthly= monthlyPerMember();
+
+  // collected from payments matrix
+  let collected = 0;
+  for (let i = 0; i < count; i++)
+    for (let j = 0; j < mc; j++)
+      if (S.payments[`m${i}_${j}`] === 'paid') collected += monthly;
+
+  // disbursed from schedule
+  let disbursed = 0;
+  for (let k = 0; k < mc; k++) {
+    if (S.schedule[k]) disbursed += (+S.schedule[k].paid || 0);
+  }
+
+  // completed cycles
+  let cycles = 0;
+  for (let k = 0; k < mc; k++) {
+    if (S.schedule[k]?.status === 'تم الصرف') cycles++;
+  }
+
+  document.getElementById('sum-total').textContent     = fmt(S.totalAmount);
+  document.getElementById('sum-members').textContent   = count + ' فرد';
+  document.getElementById('sum-share').textContent     = fmt(share);
+  document.getElementById('sum-monthly').textContent   = fmt(monthly);
+  document.getElementById('sum-collected').textContent = fmt(collected);
+  document.getElementById('sum-disbursed').textContent = fmt(disbursed);
+  document.getElementById('sum-balance').textContent   = fmt(collected - disbursed);
+  document.getElementById('sum-cycles').textContent    = cycles + ' / ' + mc;
+
+  const maxCollect = monthly * count * mc;
+  const pct = maxCollect > 0 ? Math.min(100, Math.round(collected/maxCollect*100)) : 0;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-label').textContent = fmt(collected) + ' من ' + fmt(maxCollect) + ' جنيه';
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  // member status table
+  const smTbody = document.getElementById('summaryMemberTable');
+  smTbody.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const m = S.members[i];
+    let memberPaid = 0;
+    for (let j = 0; j < mc; j++)
+      if (S.payments[`m${i}_${j}`] === 'paid') memberPaid += monthly;
+    const mPct   = mc > 0 ? Math.round(memberPaid / (monthly*mc) * 100) : 0;
+    const clz    = mPct>=80?'badge-green':mPct>=50?'badge-gold':'badge-red';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td style="text-align:right;font-weight:700">${m.name||'—'}</td>
+      <td>${m.turn}</td>
+      <td style="color:var(--green);font-weight:700">${fmt(share)}</td>
+      <td style="color:var(--blue);font-weight:700">${fmt(memberPaid)}</td>
+      <td><span class="badge ${clz}">${mPct}%</span></td>
+      <td><span class="badge ${m.status==='نشط'?'badge-green':m.status==='متأخر'?'badge-red':'badge-gray'}">${m.status}</span></td>
+    `;
+    smTbody.appendChild(tr);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+function fmt(n) {
+  return Math.round(n).toLocaleString('ar-EG') + ' ج';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function renderAll() {
+  renderSettings();
+  renderMembers();
+  renderSchedule();
+  renderPayments();
+  renderSummary();
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+syncStateToInputs();
+renderAll();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+</script>
+</body>
+</html>
