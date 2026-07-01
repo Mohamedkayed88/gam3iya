@@ -406,6 +406,10 @@
         <label>تاريخ بدء الجمعية</label>
         <input type="date" id="startDate" onchange="saveAndRefresh()">
       </div>
+      <div class="field-group">
+        <label>فترة القبض (عدد الأيام بين كل دور)</label>
+        <input type="number" id="intervalDays" value="30" min="1" max="365" onchange="saveAndRefresh()">
+      </div>
     </div>
   </div>
 
@@ -416,6 +420,7 @@
       <div class="stat-box stat-green"><div class="stat-lbl">نصيب كل فرد عند الصرف</div><div class="stat-val" id="cs-share">-</div></div>
       <div class="stat-box stat-gold"><div class="stat-lbl">القسط الشهري للفرد</div><div class="stat-val" id="cs-monthly">-</div></div>
       <div class="stat-box stat-purple"><div class="stat-lbl">عدد الأفراد</div><div class="stat-val" id="cs-members">-</div></div>
+      <div class="stat-box stat-gold"><div class="stat-lbl">فترة القبض</div><div class="stat-val" id="cs-interval">-</div></div>
     </div>
   </div>
 
@@ -621,8 +626,9 @@ function getState() {
   return {
     totalAmount: 10000,
     memberCount: 10,
-    monthCount:  10,
-    startDate:   new Date().toISOString().slice(0,10),
+    monthCount:   10,
+    startDate:    new Date().toISOString().slice(0,10),
+    intervalDays: 30,
     members: Array.from({length:10}, (_,i)=>({
       id: i+1,
       turn: i+1,
@@ -647,14 +653,16 @@ let S = getState();
 function syncInputsToState() {
   S.totalAmount  = +document.getElementById('totalAmount').value || 10000;
   S.memberCount  = +document.getElementById('memberCount').value || 10;
-  S.monthCount   = +document.getElementById('monthCount').value  || 10;
+  S.monthCount   = +document.getElementById('monthCount').value   || 10;
   S.startDate    = document.getElementById('startDate').value;
+  S.intervalDays = +document.getElementById('intervalDays').value || 30;
 }
 function syncStateToInputs() {
   document.getElementById('totalAmount').value = S.totalAmount;
   document.getElementById('memberCount').value = S.memberCount;
-  document.getElementById('monthCount').value  = S.monthCount;
-  document.getElementById('startDate').value   = S.startDate;
+  document.getElementById('monthCount').value   = S.monthCount;
+  document.getElementById('startDate').value    = S.startDate;
+  document.getElementById('intervalDays').value = S.intervalDays || 30;
 }
 
 // ══════════════════════════════════════════════════════
@@ -663,15 +671,17 @@ function syncStateToInputs() {
 function sharePerMember()  { return S.totalAmount; }
 function monthlyPerMember(){ return S.totalAmount / S.memberCount; }
 
-function addMonths(dateStr, n) {
+function addInterval(dateStr, n) {
+  const days = S.intervalDays || 30;
   const d = new Date(dateStr + 'T00:00:00');
-  d.setMonth(d.getMonth() + n);
+  d.setDate(d.getDate() + n * days);
   return d.toLocaleDateString('ar-EG', {day:'2-digit',month:'2-digit',year:'numeric'});
 }
 function monthLabel(dateStr, n) {
+  const days = S.intervalDays || 30;
   const d = new Date(dateStr + 'T00:00:00');
-  d.setMonth(d.getMonth() + n);
-  return MONTHS_AR[d.getMonth()] + ' ' + d.getFullYear();
+  d.setDate(d.getDate() + n * days);
+  return 'دور ' + (n+1) + ' — ' + MONTHS_AR[d.getMonth()] + ' ' + d.getFullYear();
 }
 
 // ══════════════════════════════════════════════════════
@@ -713,7 +723,8 @@ function renderSettings() {
   document.getElementById('cs-total').textContent   = fmt(total);
   document.getElementById('cs-share').textContent   = fmt(share);
   document.getElementById('cs-monthly').textContent = fmt(monthly);
-  document.getElementById('cs-members').textContent = mc + ' فرد';
+  document.getElementById('cs-members').textContent  = mc + ' فرد';
+  document.getElementById('cs-interval').textContent = (S.intervalDays||30) + ' يوم';
   document.getElementById('headerBadge').textContent= fmt(total) + ' ج';
 }
 
@@ -807,7 +818,7 @@ function renderSchedule() {
       <td>${i+1}</td>
       <td><span class="badge badge-blue">${monthLabel(S.startDate, i)}</span></td>
       <td style="text-align:right;font-weight:700">${m.name || '— لم يُحدد —'}</td>
-      <td>${addMonths(S.startDate, i)}</td>
+      <td>${addInterval(S.startDate, i)}</td>
       <td style="font-weight:700;color:var(--green)">${fmt(due)}</td>
       <td class="editable"><input type="number" value="${sd.paid||''}" placeholder="0" onchange="updateSchedule(${i},'paid',this.value)"></td>
       <td>${schedStatusSel(i, sd.status)}</td>
